@@ -44,7 +44,7 @@ class HathoraPhaser extends Plugins.ScenePlugin {
   // private domPublicLobbyListIDs: string[] = [];
 
   constructor(scene: Scene, manager: Plugins.PluginManager) {
-    super(scene, manager, 'HathoraPhaser3');
+    super(scene, manager, 'HathoraPhaser');
   }
 
   public boot() {
@@ -98,8 +98,8 @@ class HathoraPhaser extends Plugins.ScenePlugin {
 
   private factoryVisibilityToggle(x: number, y: number) {
     // @ts-ignore
-    const {HathoraPhaser3} = this.scene;
-    const {isCreatingPublicGame: publicGame} = HathoraPhaser3;
+    const {HathoraPhaser} = this.scene;
+    const {isCreatingPublicGame: publicGame} = HathoraPhaser;
     const publicId = `public_${uuid()}`;
     const privateId = `private_${uuid()}`;
 
@@ -124,7 +124,7 @@ class HathoraPhaser extends Plugins.ScenePlugin {
 
       btnPublic.classList.add('on');
       window.localStorage.setItem(STORAGE_KEY_CREATING_PUBLIC_GAME, 'true');
-      HathoraPhaser3.isCreatingPublicGame = true;
+      HathoraPhaser.isCreatingPublicGame = true;
     });
 
     btnPrivate.addEventListener('click', () => {
@@ -133,7 +133,7 @@ class HathoraPhaser extends Plugins.ScenePlugin {
 
       btnPrivate.classList.add('on');
       window.localStorage.setItem(STORAGE_KEY_CREATING_PUBLIC_GAME, 'false');
-      HathoraPhaser3.isCreatingPublicGame = false;
+      HathoraPhaser.isCreatingPublicGame = false;
     });
 
     return [btnPrivate, btnPublic];
@@ -141,7 +141,7 @@ class HathoraPhaser extends Plugins.ScenePlugin {
 
   private factoryRegionSelect(x: number, y: number) {
     // @ts-ignore
-    const {HathoraPhaser3} = this.scene;
+    const {HathoraPhaser} = this.scene;
     const selectId = `region_${uuid()}`;
 
     this.scene.add.dom(x, y).createFromHTML(`
@@ -161,7 +161,7 @@ class HathoraPhaser extends Plugins.ScenePlugin {
     const select = document.getElementById(selectId)! as HTMLSelectElement;
 
     const pingingRegionsPromise = new Promise<void>((resolve) => {
-      HathoraPhaser3.discoveryClient.getPingServiceEndpoints().then((regions: DiscoveryResponseInner[]) => {
+      HathoraPhaser.discoveryClient.getPingServiceEndpoints().then((regions: DiscoveryResponseInner[]) => {
         const sentAt = Date.now();
         select.disabled = true;
         select.innerHTML = ``;
@@ -192,7 +192,7 @@ class HathoraPhaser extends Plugins.ScenePlugin {
             if (finalResolved) {
               select.removeChild(loadingOption);
               select.disabled = false;
-              select.value = HathoraPhaser3.selectedRegion;
+              select.value = HathoraPhaser.selectedRegion;
               resolve();
             }
           });
@@ -200,14 +200,14 @@ class HathoraPhaser extends Plugins.ScenePlugin {
       });
     });
 
-    HathoraPhaser3.onRegionsLoad.push(pingingRegionsPromise);
+    HathoraPhaser.onRegionsLoad.push(pingingRegionsPromise);
     
     select.addEventListener('change', (e) => {
       // @ts-ignore
       const {value: region} = e.target;
       
       window.localStorage.setItem(STORAGE_KEY_DEFAULT_REGION, region);
-      HathoraPhaser3.selectedRegion = region;
+      HathoraPhaser.selectedRegion = region;
     });
 
     return select;
@@ -215,7 +215,7 @@ class HathoraPhaser extends Plugins.ScenePlugin {
 
   private factoryCreateGameButton(x: number, y: number, label: string = 'Create Game') {
     // @ts-ignore
-    const {HathoraPhaser3} = this.scene;
+    const {HathoraPhaser} = this.scene;
     const btnId = `create_${uuid()}`;
 
     this.scene.add.dom(x, y).createFromHTML(`
@@ -228,7 +228,7 @@ class HathoraPhaser extends Plugins.ScenePlugin {
 
     btn.disabled = true;
 
-    Promise.all(HathoraPhaser3.onRegionsLoad).then(() => {
+    Promise.all(HathoraPhaser.onRegionsLoad).then(() => {
       btn.disabled = false;
     });
 
@@ -236,12 +236,12 @@ class HathoraPhaser extends Plugins.ScenePlugin {
       const {hostname} = window.location;
       const isLocal = (hostname === 'localhost');
 
-      const lobby = await HathoraPhaser3.lobbyClient.createLobby(
-        HathoraPhaser3.appId,
-        HathoraPhaser3.token,
+      const lobby = await HathoraPhaser.lobbyClient.createLobby(
+        HathoraPhaser.appId,
+        HathoraPhaser.token,
         {
-          visibility: isLocal ? 'local' : HathoraPhaser3.isCreatingPublicGame ? 'public' : 'private',
-          region: HathoraPhaser3.selectedRegion,
+          visibility: isLocal ? 'local' : HathoraPhaser.isCreatingPublicGame ? 'public' : 'private',
+          region: HathoraPhaser.selectedRegion,
           initialConfig: {}
         }
       );
@@ -249,14 +249,14 @@ class HathoraPhaser extends Plugins.ScenePlugin {
       const {roomId} = lobby;
 
       console.log(roomId);
-      console.log(isLocal ? 'local' : HathoraPhaser3.isCreatingPublicGame ? 'public' : 'private');
+      console.log(isLocal ? 'local' : HathoraPhaser.isCreatingPublicGame ? 'public' : 'private');
       
-      // const connectionInfo = await HathoraPhaser3.roomClient.getConnectionInfo(
-      //   HathoraPhaser3.appId,
+      // const connectionInfo = await HathoraPhaser.roomClient.getConnectionInfo(
+      //   HathoraPhaser.appId,
       //   roomId
       // );
       
-      // HathoraPhaser3.onJoin(connectionInfo);
+      // HathoraPhaser.onJoin(connectionInfo);
     });
 
     return btn;

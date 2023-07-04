@@ -162,6 +162,10 @@
   overflow-y: scroll;
 }
 
+.ha-join-public__list--filled {
+  justify-content: flex-start;
+}
+
 .ha-join-public__game {
   width: 100%;
   display: flex;
@@ -173,11 +177,16 @@
 .ha-join-public__game label {
   flex: 1;
   padding: var(--padsm);
-  border: solid 2px var(--bcol);
+  border: solid 2px var(--bactive);
   border-radius: var(--brad);
   border-right: 0;
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
+}
+
+.ha-join-public__nogames {
+  font-size: 14px;
+  color: var(--bcol);
 }
 
 .ha-loader {

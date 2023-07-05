@@ -7,8 +7,8 @@
   --padxl: 64px;
   --bcol: rgba(242, 242, 242, 0.45);
   --brad: 8px;
-  --bactive: rgb(242, 159, 4);
-  --bgactive: rgba(242, 159, 4, 0.35);
+  --bactive: rgb(175, 100, 238);
+  --bgactive: rgb(175, 100, 238, 0.35);
   --bgfilter: blur(4px);
   --marlist: 8px;
 }

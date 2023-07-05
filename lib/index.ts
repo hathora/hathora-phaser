@@ -9,12 +9,6 @@ const STORAGE_KEY_TOKEN = 'hathora-phaser3:token';
 const STORAGE_KEY_CREATING_PUBLIC_GAME = 'hathora-phaser3:creating_public_game';
 const STORAGE_KEY_DEFAULT_REGION = 'hathora-phaser3:default_region';
 
-function sleep(timeout: number): Promise<void> {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(), timeout);
-  });
-}
-
 function waitForConnection(plugin: HathoraPhaser, roomId: string): Promise<ActiveConnectionInfo> {
   return new Promise(async (resolve) => {
     let connectionInfo: ConnectionInfo | undefined = undefined;
@@ -264,7 +258,7 @@ class HathoraPhaser extends Plugins.ScenePlugin {
     return ele;
   }
 
-  private factoryCreateGameButton(x: number, y: number, label: string = 'Create Game', forceRemote = false) {
+  private factoryCreateGameButton(x: number, y: number, label: string = 'Create Game') {
     // @ts-ignore
     const {HathoraPhaser}: { HathoraPhaser: HathoraPhaser } = this.scene;
     const btnId = `create_${uuid()}`;
@@ -294,7 +288,7 @@ class HathoraPhaser extends Plugins.ScenePlugin {
         HathoraPhaser.appId,
         HathoraPhaser.token,
         {
-          visibility: forceRemote ? 'public' : visibility,
+          visibility,
           region: HathoraPhaser.selectedRegion,
           initialConfig: {}
         }
@@ -304,7 +298,7 @@ class HathoraPhaser extends Plugins.ScenePlugin {
       const {roomId} = lobby;
 
       try {
-        if (visibility === 'local' && !forceRemote) {
+        if (visibility === 'local') {
           connectionInfo = {
             host: 'localhost',
             port: 4000,

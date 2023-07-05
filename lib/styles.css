@@ -17,7 +17,8 @@
 .ha-select,
 .ha-btn,
 .ha-text,
-.ha-join-public {
+.ha-join-public,
+.ha-loading-overlay label {
   font-family: sans-serif;
 }
 
@@ -187,6 +188,42 @@
 .ha-join-public__nogames {
   font-size: 14px;
   color: var(--bcol);
+}
+
+.ha-overlay-container {
+  width: 100%;
+  height: 100%;
+  pointer-events: none !important;
+}
+
+.ha-loading-overlay {
+  z-index: 100;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--elebg);
+  backdrop-filter: blur(2px);
+
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.32s, visibility 0.32s;
+}
+
+.ha-loading-overlay label {
+  margin-top: var(--padxl);
+  color: var(--elefg);
+  font-size: 18px;
+}
+
+.ha-loading-overlay.on {
+  opacity: 1;
+  visibility: visible;
 }
 
 .ha-loader {

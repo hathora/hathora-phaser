@@ -1,6 +1,6 @@
 import { Plugins, Scene } from "phaser";
 import { AuthV1Api, LobbyV2Api, DiscoveryV1Api, DiscoveryResponseInner, RoomV1Api, Region } from "@hathora/hathora-cloud-sdk";
-import { ConnectionInfo, HathoraConnection } from "@hathora/client-sdk";
+import { ActiveConnectionInfo, ConnectionInfo, HathoraConnection } from "@hathora/client-sdk";
 import { v4 as uuid } from 'uuid';
 // @ts-ignore
 import css from './styles.css?raw';
@@ -9,12 +9,30 @@ const STORAGE_KEY_TOKEN = 'hathora-phaser3:token';
 const STORAGE_KEY_CREATING_PUBLIC_GAME = 'hathora-phaser3:creating_public_game';
 const STORAGE_KEY_DEFAULT_REGION = 'hathora-phaser3:default_region';
 
+function sleep(timeout: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(), timeout);
+  });
+}
+
+function waitForConnection(plugin: HathoraPhaser, roomId: string): Promise<ActiveConnectionInfo> {
+  return new Promise(async (resolve) => {
+    let connectionInfo: ConnectionInfo | undefined = undefined;
+
+    while (!connectionInfo || (connectionInfo && connectionInfo.status !== 'active')) {
+      connectionInfo = await plugin.roomClient.getConnectionInfo(plugin.appId, roomId);
+    }
+
+    resolve(connectionInfo!);
+  });
+}
+
 class HathoraPhaser extends Plugins.ScenePlugin {
   // Hathora clients
   private lobbyClient: LobbyV2Api = new LobbyV2Api();
   private authClient: AuthV1Api = new AuthV1Api();
   private discoveryClient: DiscoveryV1Api = new DiscoveryV1Api();
-  private roomClient: RoomV1Api = new RoomV1Api();
+  public roomClient: RoomV1Api = new RoomV1Api();
 
   // Create game configuration
   public isCreatingPublicGame: boolean = (['true', null].includes(window.localStorage.getItem(STORAGE_KEY_CREATING_PUBLIC_GAME)));
@@ -26,7 +44,7 @@ class HathoraPhaser extends Plugins.ScenePlugin {
   public onError?: Function;
   
   // Current game's appId
-  private appId!: string;
+  public appId!: string;
   private token!: string;
 
   constructor(scene: Scene, manager: Plugins.PluginManager) {
@@ -74,6 +92,13 @@ class HathoraPhaser extends Plugins.ScenePlugin {
       sessionStorage.setItem(STORAGE_KEY_TOKEN, token);
     }
 
+    this.scene.add.dom(0, 0).createFromHTML(`
+      <div id="ha-loading" class="ha-loading-overlay">
+        <div class="ha-loader"></div>
+        <label id="ha-loading-message"></label>
+      </div>
+    `).setOrigin(0, 0).setClassName('ha-overlay-container');
+
     this.token = token;
 
     const {pathname} = window.location;
@@ -93,10 +118,7 @@ class HathoraPhaser extends Plugins.ScenePlugin {
           };
         }
         else {
-          connectionInfo = await this.roomClient.getConnectionInfo(
-            appId,
-            roomId
-          );
+          connectionInfo = await waitForConnection(this, roomId);
         }
 
         const connection = new HathoraConnection(roomId, connectionInfo);
@@ -109,6 +131,20 @@ class HathoraPhaser extends Plugins.ScenePlugin {
         onError(e);
       }
     }
+  }
+
+  public showOverlay(msg = '') {
+    const overlay = document.getElementById('ha-loading')!;
+    const message = document.getElementById('ha-loading-message')!;
+
+    overlay.classList.add('on');
+    message.innerText = msg;
+  }
+
+  public hideOverlay() {
+    const overlay = document.getElementById('ha-loading')!;
+
+    overlay.classList.remove('on');
   }
 
   private factoryVisibilityToggle(x: number, y: number) {
@@ -228,7 +264,7 @@ class HathoraPhaser extends Plugins.ScenePlugin {
     return ele;
   }
 
-  private factoryCreateGameButton(x: number, y: number, label: string = 'Create Game') {
+  private factoryCreateGameButton(x: number, y: number, label: string = 'Create Game', forceRemote = false) {
     // @ts-ignore
     const {HathoraPhaser}: { HathoraPhaser: HathoraPhaser } = this.scene;
     const btnId = `create_${uuid()}`;
@@ -252,14 +288,13 @@ class HathoraPhaser extends Plugins.ScenePlugin {
       const isLocal = (hostname === 'localhost');
       const visibility = (isLocal ? 'local' : HathoraPhaser.isCreatingPublicGame ? 'public' : 'private');
 
-      console.log(isLocal);
-      console.log(visibility);
+      HathoraPhaser.showOverlay('Creating room, please wait...');
 
       const lobby = await HathoraPhaser.lobbyClient.createLobby(
         HathoraPhaser.appId,
         HathoraPhaser.token,
         {
-          visibility,
+          visibility: forceRemote ? 'public' : visibility,
           region: HathoraPhaser.selectedRegion,
           initialConfig: {}
         }
@@ -269,7 +304,7 @@ class HathoraPhaser extends Plugins.ScenePlugin {
       const {roomId} = lobby;
 
       try {
-        if (visibility === 'local') {
+        if (visibility === 'local' && !forceRemote) {
           connectionInfo = {
             host: 'localhost',
             port: 4000,
@@ -278,10 +313,7 @@ class HathoraPhaser extends Plugins.ScenePlugin {
           };
         }
         else {
-          connectionInfo = await HathoraPhaser.roomClient.getConnectionInfo(
-            HathoraPhaser.appId,
-            roomId
-          );
+          connectionInfo = await waitForConnection(HathoraPhaser, roomId);
         }
   
         const connection = new HathoraConnection(roomId, connectionInfo);
@@ -290,6 +322,7 @@ class HathoraPhaser extends Plugins.ScenePlugin {
         
         HathoraPhaser.onJoin!(connection);
         history.pushState({}, "", `/${roomId}`);
+        HathoraPhaser.hideOverlay();
       }
       catch (e) {
         HathoraPhaser.onError!(e);
@@ -333,10 +366,7 @@ class HathoraPhaser extends Plugins.ScenePlugin {
           };
         }
         else {
-          connectionInfo = await HathoraPhaser.roomClient.getConnectionInfo(
-            HathoraPhaser.appId,
-            roomId
-          );
+          connectionInfo = await waitForConnection(HathoraPhaser, roomId);
         }
 
         const connection = new HathoraConnection(roomId, connectionInfo);
@@ -388,10 +418,7 @@ class HathoraPhaser extends Plugins.ScenePlugin {
           };
         }
         else {
-          connectionInfo = await HathoraPhaser.roomClient.getConnectionInfo(
-            HathoraPhaser.appId,
-            roomId
-          );
+          connectionInfo = await waitForConnection(HathoraPhaser, roomId);
         }
 
         const connection = new HathoraConnection(roomId, connectionInfo);
@@ -440,33 +467,9 @@ class HathoraPhaser extends Plugins.ScenePlugin {
 
     return ele;
   }
-
-  // private async refreshPublicLobbyLists() {
-  //   // Show spinners on all lobby lists
-  //   const publicLobbies = await this.lobbyClient.listActivePublicLobbies(this.appId!, this.region);
-
-  //   this.domPublicLobbyListIDs.forEach((id) => {
-  //     const lobbyListDiv = document.getElementById(id);
-  //     let listHTML = '';
-      
-  //     if (lobbyListDiv) {
-  //       publicLobbies.forEach((lobby) => {
-  //         // const 
-  //         listHTML += `
-  //         <div class="ha-join-public__game">
-  //           <label>1d7lxrzfagao8</label>
-  //           <button data-join-room-id="${lobby.roomId}" class="ha-btn ha-btn--join">
-  //             Join
-  //           </button>
-  //         </div>
-  //         `;
-  //       });
-  //     }
-  //   });
-  // }
 }
 
 export {
   HathoraPhaser,
   HathoraConnection
-}
+};

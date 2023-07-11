@@ -17,7 +17,7 @@ declare class HathoraPhaser extends Plugins.ScenePlugin {
     debugId: string;
     constructor(scene: Scene, manager: Plugins.PluginManager);
     boot(): void;
-    initialize(appId: string, onJoin: Function, onError: Function, useUrl?: boolean): Promise<void>;
+    initialize(appId: string, onJoin: Function, onError: Function, useUrl?: boolean, defaultVisibility?: 'public' | 'private'): Promise<void>;
     showOverlay(msg?: string): void;
     hideOverlay(): void;
     private factoryVisibilityToggle;

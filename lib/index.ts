@@ -1,5 +1,5 @@
 import { Plugins, Scene } from "phaser";
-import { AuthV1Api, LobbyV2Api, DiscoveryResponseInner, RoomV1Api, Region } from "@hathora/hathora-cloud-sdk";
+import { AuthV1Api, LobbyV2Api, DiscoveryResponseInner, RoomV1Api, Region, DiscoveryV1Api } from "@hathora/hathora-cloud-sdk";
 import { ActiveConnectionInfo, ConnectionInfo, HathoraConnection } from "@hathora/client-sdk";
 import { v4 as uuid } from 'uuid';
 // @ts-ignore
@@ -26,7 +26,7 @@ class HathoraPhaser extends Plugins.ScenePlugin {
   // Hathora clients
   private lobbyClient: LobbyV2Api = new LobbyV2Api();
   private authClient: AuthV1Api = new AuthV1Api();
-  // private discoveryClient: DiscoveryV1Api = new DiscoveryV1Api();
+  public discoveryClient: DiscoveryV1Api = new DiscoveryV1Api();
   public roomClient: RoomV1Api = new RoomV1Api();
 
   // Create game configuration
@@ -64,7 +64,7 @@ class HathoraPhaser extends Plugins.ScenePlugin {
     this.pluginManager.registerGameObject('haJoinPublicList', this.factoryJoinPublicList);
   }
 
-  public async initialize(appId: string, onJoin: Function, onError: Function, useUrl: boolean = true) {
+  public async initialize(appId: string, onJoin: Function, onError: Function, useUrl: boolean = true, defaultVisibility?: 'public' | 'private') {
     if (this.appId) {
       console.error('You should only call initialize once.');
       return;
@@ -73,6 +73,10 @@ class HathoraPhaser extends Plugins.ScenePlugin {
     this.appId = appId;
     this.onJoin = onJoin;
     this.onError = onError;
+    
+    if (defaultVisibility) {
+      this.isCreatingPublicGame = (defaultVisibility === 'public');
+    }
 
     let token: any = '';
 

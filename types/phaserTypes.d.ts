@@ -1,6 +1,5 @@
 import type * as _Phaser from "phaser";
 import type { HathoraPhaser } from ".";
-
 declare module "phaser" {
     interface Scene {
         HathoraPhaser: HathoraPhaser;

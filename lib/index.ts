@@ -43,6 +43,8 @@ class HathoraPhaser extends Plugins.ScenePlugin {
 
   public pollId?: number;
 
+  public debugId: string = Math.random().toString(36).substring(2);
+
   constructor(scene: Scene, manager: Plugins.PluginManager) {
     super(scene, manager, 'HathoraPhaser');
   }
@@ -59,10 +61,6 @@ class HathoraPhaser extends Plugins.ScenePlugin {
     this.pluginManager.registerGameObject('haCreateGameButton', this.factoryCreateGameButton);
     this.pluginManager.registerGameObject('haJoinPrivateInput', this.factoryJoinPrivateInput);
     this.pluginManager.registerGameObject('haJoinPublicList', this.factoryJoinPublicList);
-
-    console.log(this.authClient);
-    console.log(this.lobbyClient);
-    console.log(this.discoveryClient);
   }
 
   public async initialize(appId: string, onJoin: Function, onError: Function, useUrl: boolean = true) {
@@ -121,8 +119,8 @@ class HathoraPhaser extends Plugins.ScenePlugin {
 
         connection.connect(token);
         
-        onJoin(connection);
         clearInterval(this.pollId);
+        onJoin(connection);
       }
       catch (e) {
         onError(e);
@@ -287,20 +285,20 @@ class HathoraPhaser extends Plugins.ScenePlugin {
 
       HathoraPhaser.showOverlay('Creating room, please wait...');
 
-      const lobby = await HathoraPhaser.lobbyClient.createLobby(
-        HathoraPhaser.appId,
-        HathoraPhaser.token,
-        {
-          visibility,
-          region: HathoraPhaser.selectedRegion,
-          initialConfig: {}
-        }
-      );
-
-      let connectionInfo: ConnectionInfo;
-      const {roomId} = lobby;
-
       try {
+        const lobby = await HathoraPhaser.lobbyClient.createLobby(
+          HathoraPhaser.appId,
+          HathoraPhaser.token,
+          {
+            visibility,
+            region: HathoraPhaser.selectedRegion,
+            initialConfig: {}
+          }
+        );
+
+        let connectionInfo: ConnectionInfo;
+        const {roomId} = lobby;
+
         if (visibility === 'local') {
           connectionInfo = {
             host: 'localhost',
@@ -317,10 +315,10 @@ class HathoraPhaser extends Plugins.ScenePlugin {
   
         connection.connect(HathoraPhaser.token);
         
+        clearInterval(HathoraPhaser.pollId);
         HathoraPhaser.onJoin!(connection);
         history.pushState({}, "", `/${roomId}`);
         HathoraPhaser.hideOverlay();
-        clearInterval(this.pollId);
       }
       catch (e) {
         HathoraPhaser.onError!(e);
@@ -371,9 +369,9 @@ class HathoraPhaser extends Plugins.ScenePlugin {
 
         connection.connect(HathoraPhaser.token);
         
+        clearInterval(this.pollId);
         HathoraPhaser.onJoin!(connection);
         history.pushState({}, "", `/${roomId}`);
-        clearInterval(this.pollId);
       }
       catch (e) {
         HathoraPhaser.onError!(e);
@@ -424,9 +422,9 @@ class HathoraPhaser extends Plugins.ScenePlugin {
 
         connection.connect(HathoraPhaser.token);
         
+        clearInterval(this.pollId);
         HathoraPhaser.onJoin!(connection);
         history.pushState({}, "", `/${roomId}`);
-        clearInterval(this.pollId);
       }
       catch (e) {
         HathoraPhaser.onError!(e);

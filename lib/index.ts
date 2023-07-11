@@ -1,9 +1,10 @@
 import { Plugins, Scene } from "phaser";
-import { AuthV1Api, LobbyV2Api, DiscoveryV1Api, DiscoveryResponseInner, RoomV1Api, Region } from "@hathora/hathora-cloud-sdk";
+import { AuthV1Api, LobbyV2Api, DiscoveryResponseInner, RoomV1Api, Region } from "@hathora/hathora-cloud-sdk";
 import { ActiveConnectionInfo, ConnectionInfo, HathoraConnection } from "@hathora/client-sdk";
 import { v4 as uuid } from 'uuid';
 // @ts-ignore
 import css from './styles.css?raw';
+import './phaserTypes';
 
 const STORAGE_KEY_TOKEN = 'hathora-phaser3:token';
 const STORAGE_KEY_CREATING_PUBLIC_GAME = 'hathora-phaser3:creating_public_game';
@@ -25,7 +26,7 @@ class HathoraPhaser extends Plugins.ScenePlugin {
   // Hathora clients
   private lobbyClient: LobbyV2Api = new LobbyV2Api();
   private authClient: AuthV1Api = new AuthV1Api();
-  private discoveryClient: DiscoveryV1Api = new DiscoveryV1Api();
+  // private discoveryClient: DiscoveryV1Api = new DiscoveryV1Api();
   public roomClient: RoomV1Api = new RoomV1Api();
 
   // Create game configuration
@@ -148,7 +149,6 @@ class HathoraPhaser extends Plugins.ScenePlugin {
     const {isCreatingPublicGame: publicGame} = HathoraPhaser;
     const publicId = `public_${uuid()}`;
     const privateId = `private_${uuid()}`;
-
 
     const ele = this.scene.add.dom(x, y).createFromHTML(`
       <div class="ha-toggle">

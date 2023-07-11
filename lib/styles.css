@@ -69,7 +69,7 @@
 
 .ha-select {
   display: block;
-  width: 300px;
+  width: 200px;
   margin: 0;
   padding: var(--padsm);
   border: solid 2px var(--bcol);

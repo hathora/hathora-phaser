@@ -1,10 +1,11 @@
 import { Plugins, Scene } from "phaser";
-import { RoomV1Api, Region } from "@hathora/hathora-cloud-sdk";
+import { RoomV1Api, Region, DiscoveryV1Api } from "@hathora/hathora-cloud-sdk";
 import { HathoraConnection } from "@hathora/client-sdk";
 import './phaserTypes';
 declare class HathoraPhaser extends Plugins.ScenePlugin {
     private lobbyClient;
     private authClient;
+    discoveryClient: DiscoveryV1Api;
     roomClient: RoomV1Api;
     isCreatingPublicGame: boolean;
     selectedRegion: Region;

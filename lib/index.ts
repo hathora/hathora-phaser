@@ -41,6 +41,8 @@ class HathoraPhaser extends Plugins.ScenePlugin {
   public appId!: string;
   private token!: string;
 
+  public pollId?: number;
+
   constructor(scene: Scene, manager: Plugins.PluginManager) {
     super(scene, manager, 'HathoraPhaser');
   }
@@ -120,6 +122,7 @@ class HathoraPhaser extends Plugins.ScenePlugin {
         connection.connect(token);
         
         onJoin(connection);
+        clearInterval(this.pollId);
       }
       catch (e) {
         onError(e);
@@ -317,6 +320,7 @@ class HathoraPhaser extends Plugins.ScenePlugin {
         HathoraPhaser.onJoin!(connection);
         history.pushState({}, "", `/${roomId}`);
         HathoraPhaser.hideOverlay();
+        clearInterval(this.pollId);
       }
       catch (e) {
         HathoraPhaser.onError!(e);
@@ -369,6 +373,7 @@ class HathoraPhaser extends Plugins.ScenePlugin {
         
         HathoraPhaser.onJoin!(connection);
         history.pushState({}, "", `/${roomId}`);
+        clearInterval(this.pollId);
       }
       catch (e) {
         HathoraPhaser.onError!(e);
@@ -421,6 +426,7 @@ class HathoraPhaser extends Plugins.ScenePlugin {
         
         HathoraPhaser.onJoin!(connection);
         history.pushState({}, "", `/${roomId}`);
+        clearInterval(this.pollId);
       }
       catch (e) {
         HathoraPhaser.onError!(e);
@@ -456,7 +462,7 @@ class HathoraPhaser extends Plugins.ScenePlugin {
       });
     };
 
-    setInterval(pollPublicLobbies, pollRate);
+    HathoraPhaser.pollId = setInterval(pollPublicLobbies, pollRate);
     pollPublicLobbies();
 
     return ele;

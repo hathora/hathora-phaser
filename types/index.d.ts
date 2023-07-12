@@ -14,7 +14,9 @@ declare class HathoraPhaser extends Plugins.ScenePlugin {
     onError?: Function;
     appId: string;
     private token;
-    pollId?: number;
+    publicLobbyPollId?: number;
+    joinedGame: boolean;
+    regions: string[];
     debugId: string;
     constructor(scene: Scene, manager: Plugins.PluginManager);
     boot(): void;

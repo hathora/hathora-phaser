@@ -9,6 +9,7 @@ import './phaserTypes';
 const STORAGE_KEY_TOKEN = 'hathora-phaser3:token';
 const STORAGE_KEY_CREATING_PUBLIC_GAME = 'hathora-phaser3:creating_public_game';
 const STORAGE_KEY_DEFAULT_REGION = 'hathora-phaser3:default_region';
+const NUM_REGION_PINGS = 5;
 
 function waitForConnection(plugin: HathoraPhaser, roomId: string): Promise<ActiveConnectionInfo> {
   return new Promise(async (resolve) => {
@@ -42,7 +43,19 @@ class HathoraPhaser extends Plugins.ScenePlugin {
   public appId!: string;
   private token!: string;
 
-  public pollId?: number;
+  public publicLobbyPollId?: number;
+  public joinedGame: boolean = false;
+  public regions: string[] = [
+    'Seattle',
+    'Washington_DC',
+    'London',
+    'Franfurt',
+    'Mumbai',
+    'Singapore',
+    'Tokyo',
+    'Sydney',
+    'Sao_Paulo'
+  ];
 
   public debugId: string = Math.random().toString(36).substring(2);
 
@@ -124,7 +137,8 @@ class HathoraPhaser extends Plugins.ScenePlugin {
 
         connection.connect(token);
         
-        clearInterval(this.pollId);
+        clearInterval(this.publicLobbyPollId);
+        this.joinedGame = true;
         onJoin(connection);
       }
       catch (e) {
@@ -196,61 +210,88 @@ class HathoraPhaser extends Plugins.ScenePlugin {
 
     const ele = this.scene.add.dom(x, y).createFromHTML(`
       <select id="${selectId}" class="ha-select">
-        <option value="Seattle">Seattle</option>
-        <option value="Washington_DC">Washington, DC</option>
-        <option value="London">London</option>
-        <option value="Franfurt">Franfurt</option>
-        <option value="Mumbai">Mumbai</option>
-        <option value="Singapore">Singapore</option>
-        <option value="Tokyo">Tokyo</option>
-        <option value="Sydney">Sydney</option>
-        <option value="Sao_Paulo">Sao Paulo</option>
+        <option value="Seattle" id="${selectId}_Seattle">Seattle</option>
+        <option value="Washington_DC" id="${selectId}_Washington_DC">Washington, DC</option>
+        <option value="London" id="${selectId}_London">London</option>
+        <option value="Franfurt" id="${selectId}_Franfurt">Franfurt</option>
+        <option value="Mumbai" id="${selectId}_Mumbai">Mumbai</option>
+        <option value="Singapore" id="${selectId}_Singapore">Singapore</option>
+        <option value="Tokyo" id="${selectId}_Tokyo">Tokyo</option>
+        <option value="Sydney" id="${selectId}_Sydney">Sydney</option>
+        <option value="Sao_Paulo" id="${selectId}_Sao_Paulo">Sao Paulo</option>
       </select>
     `).setOrigin(0.5);
 
     const select = document.getElementById(selectId)! as HTMLSelectElement;
 
-    const pingingRegionsPromise = new Promise<void>((resolve) => {
-      HathoraPhaser.discoveryClient.getPingServiceEndpoints().then((regions: DiscoveryResponseInner[]) => {
-        const sentAt = Date.now();
-        select.disabled = true;
-        select.innerHTML = ``;
-  
-        const loadingOption = new Option();
-        loadingOption.value = "";
-        loadingOption.innerText = "Loading...";
-        loadingOption.id = `${selectId}_loading`;
-  
-        select.append(loadingOption);
-  
-        let resolvedRegions = 0;
-  
-        regions.forEach((region) => {
-          fetch(`https://${region.host}:${region.port}`, {
+    // Get average ping for each region
+    const initPingRegionsPromise = new Promise<void>(async (resolve) => {
+      const regions: DiscoveryResponseInner[] = await HathoraPhaser.discoveryClient.getPingServiceEndpoints();
+      select.disabled = true;
+      select.innerHTML = ``;
+
+      const loadingOption = new Option();
+      loadingOption.value = "";
+      loadingOption.innerText = "Loading...";
+      loadingOption.id = `${selectId}_loading`;
+
+      select.append(loadingOption);
+
+      const regionPings: Map<string, number[]> = new Map();
+      const pingPromises = regions.map(async (region) => {
+        regionPings.set(region.region, []);
+
+        for (let i = 0; i < NUM_REGION_PINGS; i++) {
+          const sentAt = Date.now();
+
+          await fetch(`https://${region.host}:${region.port}`, {
             mode: 'no-cors'
-          }).then(() => {
-            resolvedRegions++;
-            const ping = (Date.now() - sentAt);
-            const finalResolved = (resolvedRegions === regions.length);
-  
-            const regionOption = new Option();
-            regionOption.value = region.region;
-            regionOption.innerText = `${region.region} (${ping}ms)`;
-  
-            select.append(regionOption);
-  
-            if (finalResolved) {
-              select.removeChild(loadingOption);
-              select.disabled = false;
-              select.value = HathoraPhaser.selectedRegion;
-              resolve();
-            }
           });
+
+          const ping = (Date.now() - sentAt);
+          const pings = regionPings.get(region.region)!;
+          const newPings = [
+            ...pings,
+            ping
+          ];
+
+          regionPings.set(region.region, newPings);
+        }
+      });
+
+      await Promise.all(pingPromises);
+
+      let sortedOptions: { ping: number, ele: HTMLOptionElement }[] = [];
+
+      regionPings.forEach((pings, region) => {
+        let avgPing = 0;
+        pings.forEach((ping) => avgPing += ping);
+        avgPing = Math.floor(avgPing / NUM_REGION_PINGS);
+
+        const regionOption = new Option();
+        regionOption.value = region;
+        regionOption.innerText = `${region} (${avgPing}ms)`;
+        regionOption.id = `${selectId}_${region}`;
+
+        sortedOptions.push({
+          ping: avgPing,
+          ele: regionOption
         });
       });
+
+      sortedOptions.sort((a, b) => a.ping - b.ping);
+
+      sortedOptions.forEach(({ ele }) => {
+        select.append(ele);
+      });
+
+      loadingOption.remove();
+      select.disabled = false;
+
+      resolve();
     });
 
-    HathoraPhaser.onRegionsLoad.push(pingingRegionsPromise);
+    HathoraPhaser.onRegionsLoad.push(initPingRegionsPromise);
     
     select.addEventListener('change', (e) => {
       // @ts-ignore
@@ -319,7 +360,8 @@ class HathoraPhaser extends Plugins.ScenePlugin {
   
         connection.connect(HathoraPhaser.token);
         
-        clearInterval(HathoraPhaser.pollId);
+        clearInterval(HathoraPhaser.publicLobbyPollId);
+        HathoraPhaser.joinedGame = true;
         HathoraPhaser.onJoin!(connection);
         history.pushState({}, "", `/${roomId}`);
         HathoraPhaser.hideOverlay();
@@ -373,7 +415,8 @@ class HathoraPhaser extends Plugins.ScenePlugin {
 
         connection.connect(HathoraPhaser.token);
         
-        clearInterval(this.pollId);
+        clearInterval(this.publicLobbyPollId);
+        HathoraPhaser.joinedGame = true;
         HathoraPhaser.onJoin!(connection);
         history.pushState({}, "", `/${roomId}`);
       }
@@ -426,7 +469,8 @@ class HathoraPhaser extends Plugins.ScenePlugin {
 
         connection.connect(HathoraPhaser.token);
         
-        clearInterval(this.pollId);
+        clearInterval(this.publicLobbyPollId);
+        HathoraPhaser.joinedGame = true;
         HathoraPhaser.onJoin!(connection);
         history.pushState({}, "", `/${roomId}`);
       }
@@ -464,7 +508,7 @@ class HathoraPhaser extends Plugins.ScenePlugin {
       });
     };
 
-    HathoraPhaser.pollId = setInterval(pollPublicLobbies, pollRate);
+    HathoraPhaser.publicLobbyPollId = setInterval(pollPublicLobbies, pollRate);
     pollPublicLobbies();
 
     return ele;

@@ -8,7 +8,7 @@ declare class HathoraPhaser extends Plugins.ScenePlugin {
     discoveryClient: DiscoveryV1Api;
     roomClient: RoomV1Api;
     isCreatingPublicGame: boolean;
-    selectedRegion: Region;
+    selectedRegion: Region | 'All';
     onRegionsLoad: Promise<void>[];
     onJoin?: Function;
     onError?: Function;
@@ -17,6 +17,10 @@ declare class HathoraPhaser extends Plugins.ScenePlugin {
     publicLobbyPollId?: number;
     joinedGame: boolean;
     regions: string[];
+    regionPings: {
+        ping: number;
+        region: Region;
+    }[];
     debugId: string;
     constructor(scene: Scene, manager: Plugins.PluginManager);
     boot(): void;

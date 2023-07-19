@@ -1,9 +1,8 @@
 {
   "name": "hathora-phaser",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "type": "module",
   "main": "dist/HathoraPhaser.js",
-  "types": "types/index.d.ts",
   "scripts": {
     "start": "vite",
     "build": "tsc && vite build --watch",

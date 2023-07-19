@@ -401,15 +401,15 @@ class HathoraPhaser extends Plugins.ScenePlugin {
     return ele;
   }
 
-  private factoryJoinPrivateInput(x: number, y: number, label: string = 'Join') {
+  private factoryJoinPrivateInput(x: number, y: number, label: string = 'Join', width?: number) {
     // @ts-ignore
     const {HathoraPhaser}: {HathoraPhaser: HathoraPhaser} = this.scene;
     const txtId = `join_private_${uuid()}`;
     const btnId = `join_private_${uuid()}`;
 
     const ele = this.scene.add.dom(x, y).createFromHTML(`
-      <div class="ha-join-private">
-        <input id="${txtId}" class="ha-text ha-text--join" />
+      <div class="ha-join-private"${width ? ` style="width: ${width}px"` : ''}>
+        <input id="${txtId}" class="ha-text ha-text--join" placeholder="Room ID" />
         <button id="${btnId}" class="ha-btn ha-btn--join">
           ${label}
         </button>
@@ -532,12 +532,11 @@ class HathoraPhaser extends Plugins.ScenePlugin {
       }
       else {
         if (HathoraPhaser.selectedRegion === 'All') {
-
+          listHTML = `<div class="ha-join-public__nogames">No active games.</div>`;
         }
         else {
-
+          listHTML = `<div class="ha-join-public__nogames">No active games in ${HathoraPhaser.selectedRegion} region.</div>`;
         }
-        listHTML = `<div class="ha-join-public__nogames">No active games in ${HathoraPhaser.selectedRegion} region.</div>`;
         list!.classList.remove('ha-join-public__list--filled');
       }
 

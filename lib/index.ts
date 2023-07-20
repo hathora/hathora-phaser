@@ -519,9 +519,19 @@ class HathoraPhaser extends Plugins.ScenePlugin {
 
       if (publicLobbies.length > 0) {
         publicLobbies.forEach((lobby) => {
+          const state = lobby.state as any;
+
           listHTML += `
             <div class="ha-join-public__game">
-              <label>${lobby.roomId}</label>
+              <label>
+                <span>${lobby.roomId}</span>
+                <span>${lobby.region}</span>
+                ${
+                  state && !isNaN(state.totalPlayers)
+                  ? `<span>${state.totalPlayers} Player${state.totalPlayers !== 1 ? 's' : ''}</span>`
+                  : ``
+                }
+              </label>
               <button data-join-room-id="${lobby.roomId}" class="ha-btn ha-btn--join">
                 Join
               </button>

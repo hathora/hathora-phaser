@@ -1,0 +1,25 @@
+Running TODO:
+  ☐ Readme
+  ☐ Can you include region and player count in the public lobby list? (can look at https://bullet-mania.vercel.app/ as a reference)
+  ☐ Can you add ping count once you have joined the game? Can do what we do in bullet mania for this
+  ☐ Small bug where sometimes my controls get "stuck", in that up or right doesn't register anymore. A repro is to right-click somewhere while in the game and then it takes a while for the controls to come back
+
+Done since last talk:
+  ✔ Ping sample over average of last N packets @done(23-07-12 04:15)
+  ✔ Set polling rate in factory function, default = / 2s @done(23-07-12 04:22)
+  ✔ Deployment bug @done(23-07-05 14:40)
+    ✔ Host and port undefined @done(23-07-05 14:40)
+    ✔ Defaulting to ws not wss @done(23-07-05 14:40)
+  ✔ Flesh out demo game a little bit such that there's an actual lobby screen @done(23-07-19 16:18)
+  ✔ Store user token in session storage and reuse where appropriate @done(23-06-28 06:19)
+  ✔ /{roomId} on join by room ID element @done(23-06-28 06:03)
+  ✔ Join Public Game list @done(23-07-04 14:50)
+    ✔ Poll list of public games @done(23-06-29 20:41)
+    ✔ On list item click -> join that game @done(23-07-04 14:50)
+  ✔ Make default colours Hathora-purple @done(23-07-04 21:55)
+  ✔ All regions option @done(23-07-17 03:42)
+
+
+To discuss:
+  ☐ Environment instead of window.location for local check
+    We need this to be based on the game importing, not our own lib's build

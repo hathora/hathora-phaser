@@ -218,3 +218,28 @@ this.add.haJoinPublicList(250, 250, 400, 400, 'Find a Game', 500);
 ```
 
 ### `[scene].add.haJoinPrivateInput`
+
+Adds an input with a join button which allows players to enter a public or private game room by roomId.
+
+![Join private input with default styling.](https://github.com/hathora/hathora-phaser/assets/7004280/810e2fb3-5f75-4b80-9292-43f988f3b185)
+
+#### Parameters
+
+| Parameter   | Type     | Description                                             |
+| ----------- | -------- | --------------------------------------------------------|
+| x           | number   | The X coordinate to display the join private input at.  |
+| y           | number   | The Y coordinate to display the join private input at.  |
+| label       | string   | An optional override for the join button's label.       |
+| width       | number   | An optional width to display the join private input at. |
+
+#### CSS Customization
+
+- `.ha-join-private`: Class applied to the containing `<div>` of the element ([default styling](https://github.com/hathora/hathora-phaser/blob/main/lib/styles.css#L103-L106))
+- `.ha-text.ha-text--join`: Classes applied to the text `<input>` of the element ([default styling](https://github.com/hathora/hathora-phaser/blob/main/lib/styles.css#L113-L129))
+- `.ha-btn.ha-btn--join`: Classes applied to the `<button>` of the element ([default styling](https://github.com/hathora/hathora-phaser/blob/main/lib/styles.css#L131-L135))
+
+#### Example Usage
+
+```ts
+this.add.haJoinPrivateInput(250, 250, 'Join Game', 500);
+```

@@ -82,4 +82,34 @@ For a full example using all available UI elements, please [see this repo](#todo
 
 ## API
 
-(Todo)
+### `[scene].HathoraPhaser.initialize`
+
+Called once, to initialize the plugin.
+
+#### Parameters
+
+| Parameter          | Type     | Description                                                                  |
+| ------------------ | -------- | ---------------------------------------------------------------------------- |
+| appId              | string   | Your Hathora appId, get it from [the console](https://console.hathora.dev).  |
+| connectionCallback | function | A callback function, with a `HathoraConnection` object as a parameter.       |
+| errorCallback      | function | A callback function if a connection error occurs, with an `error` parameter. |
+| useUrl             | boolean  | Defaults to true, a flag to specify if the URL should be read as a roomId.   |
+| defaultVisibility  | string   | 'public' or 'private', represents connection visibility if no toggle.        |
+
+#### Example usage
+
+```ts
+this.HathoraPhaser.initialize(
+  '[HATHORA_APP_ID]',
+  (connection: HathoraConnection) => {
+    this.scene.start('scene-game', {
+      connection
+    });
+  },
+  (error: any) => {
+    console.warn(error);
+  },
+  true
+);
+```
+

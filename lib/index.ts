@@ -529,7 +529,7 @@ class HathoraPhaser extends Plugins.ScenePlugin {
                 ${
                   state && !isNaN(state.totalPlayers)
                   ? `<span>${state.totalPlayers} Player${state.totalPlayers !== 1 ? 's' : ''}</span>`
-                  : ``
+                  : `<span>0 Players</span>`
                 }
               </label>
               <button data-join-room-id="${lobby.roomId}" class="ha-btn ha-btn--join">

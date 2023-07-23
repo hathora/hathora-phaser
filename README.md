@@ -96,7 +96,7 @@ Called once, to initialize the plugin.
 | useUrl             | boolean  | Defaults to true, a flag to specify if the URL should be read as a roomId.   |
 | defaultVisibility  | string   | 'public' or 'private', represents connection visibility if no toggle.        |
 
-#### Example usage
+#### Example Usage
 
 ```ts
 this.HathoraPhaser.initialize(
@@ -133,7 +133,7 @@ Adds a visibility toggle to the scene which the player can use to specify a new 
 - `.ha-toggle__switch`: Inner `<button>` classes ([default styling](https://github.com/hathora/hathora-phaser/blob/main/lib/styles.css#L32-L55)).
 - `(switch class).on`: Conditional class to signify the selected `<button>` element ([default styling](https://github.com/hathora/hathora-phaser/blob/main/lib/styles.css#L57-L68)).
 
-#### Example usage
+#### Example Usage
 
 ```ts
 this.add.haVisibilityToggle(250, 250);
@@ -157,6 +157,12 @@ Adds a create game button to the scene which if clicked will create a new game r
 
 - `.ha-btn`: Class applied to the `<button>` element ([default styling](https://github.com/hathora/hathora-phaser/blob/main/lib/styles.css#L87-L101)).
 
+#### Example Usage
+
+```ts
+this.add.haCreateGameButton(250, 250, 'Create a New Game');
+```
+
 ### `[scene].add.haRegionSelect`
 
 Adds a dropdown menu populated with server regions and their average pings to the connected client.
@@ -174,6 +180,41 @@ Adds a dropdown menu populated with server regions and their average pings to th
 
 - `.ha-select`: Class applied to the `<select>` element ([default styling](https://github.com/hathora/hathora-phaser/blob/main/lib/styles.css#L70-L85)).
 
+#### Example Usage
+
+```ts
+this.add.haRegionSelect(250, 250);
+```
+
 ### `[scene].add.haJoinPublicList`
+
+Adds a scrollable panel which displays the active public games in the selected region.
+
+![Join public list dialog with default styling.](https://github.com/hathora/hathora-phaser/assets/7004280/70af0018-a31a-4464-9ed1-edc58b6b9ad3)
+
+#### Parameters
+
+| Parameter   | Type     | Description                                                        |
+| ----------- | -------- | ------------------------------------------------------------------ |
+| x           | number   | The X coordinate to display the join public game panel at.         |
+| y           | number   | The Y coordinate to display the join public game panel at.         |
+| width       | number   | The horizontal width to display the join public game panel at.     |
+| height      | number   | The vertical height to display the join public game panel at.      |
+| label       | string   | An optional override for the panel's heading label.                |
+| pollRate    | number   | An optional override for the panel's polling rate in milliseconds. |
+
+#### CSS Customization
+
+- `.ha-join-public`: Class applied to the parent `<div>` element ([default styling](https://github.com/hathora/hathora-phaser/blob/main/lib/styles.css#L137-L148)).
+- `.ha-join-public__header`: Class applied to the `<header>` element of the panel ([default styling](https://github.com/hathora/hathora-phaser/blob/main/lib/styles.css#L150-L157)).
+- `.ha-join-public__list`: Class applied to the scrollable `<div>` containing individual game rooms ([default styling](https://github.com/hathora/hathora-phaser/blob/main/lib/styles.css#L159-L167)).
+- `.ha-join-public__list--filled`: Conditional class to signify that the list has entries ([default styling](https://github.com/hathora/hathora-phaser/blob/main/lib/styles.css#L169-L171)).
+- `.ha-join-public__game`: Class applied to the individual rows representing a game room ([default styling](https://github.com/hathora/hathora-phaser/blob/main/lib/styles.css#L173-L211)).
+
+#### Example Usage
+
+```ts
+this.add.haJoinPublicList(250, 250, 400, 400, 'Find a Game', 500);
+```
 
 ### `[scene].add.haJoinPrivateInput`

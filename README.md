@@ -159,6 +159,21 @@ Adds a create game button to the scene which if clicked will create a new game r
 
 ### `[scene].add.haRegionSelect`
 
+Adds a dropdown menu populated with server regions and their average pings to the connected client.
+
+![Region select dropdown with default styling.](https://github.com/hathora/hathora-phaser/assets/7004280/c7f7e779-9228-4c82-a95a-bd5510060476)
+
+#### Parameters
+
+| Parameter   | Type     | Description                                                 |
+| ----------- | -------- | ----------------------------------------------------------- |
+| x           | number   | The X coordinate to display the region select dropdown at.  |
+| y           | number   | The Y coordinate to display the region select dropdown at.  |
+
+#### CSS Customization
+
+- `.ha-select`: Class applied to the `<select>` element ([default styling](https://github.com/hathora/hathora-phaser/blob/main/lib/styles.css#L70-L85)).
+
 ### `[scene].add.haJoinPublicList`
 
 ### `[scene].add.haJoinPrivateInput`

@@ -138,3 +138,27 @@ Adds a visibility toggle to the scene which the player can use to specify a new 
 ```ts
 this.add.haVisibilityToggle(250, 250);
 ```
+
+### `[scene].add.haCreateGameButton`
+
+Adds a create game button to the scene which if clicked will create a new game room on the server.
+
+![Create game button with default styling.](https://github.com/hathora/hathora-phaser/assets/7004280/f7fd8146-4ae3-4f2f-92b6-8a5e6c7c8371)
+
+#### Parameters
+
+| Parameter   | Type     | Description                                             |
+| ----------- | -------- | ------------------------------------------------------- |
+| x           | number   | The X coordinate to display the create game button at.  |
+| y           | number   | The Y coordinate to display the create game button at.  |
+| label       | string   | An optional string to change the button's label text.   |
+
+#### CSS Customization
+
+- `.ha-btn`: Class applied to the `<button>` element ([default styling](https://github.com/hathora/hathora-phaser/blob/main/lib/styles.css#L87-L101)).
+
+### `[scene].add.haRegionSelect`
+
+### `[scene].add.haJoinPublicList`
+
+### `[scene].add.haJoinPrivateInput`

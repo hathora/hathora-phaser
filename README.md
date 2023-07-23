@@ -113,3 +113,28 @@ this.HathoraPhaser.initialize(
 );
 ```
 
+
+### `[scene].add.haVisibilityToggle`
+
+Adds a visibility toggle to the scene which the player can use to specify a new game's visibility.
+
+![Visibility toggle element with default styling.](https://github.com/hathora/hathora-phaser/assets/7004280/86a55be3-814f-4c94-a4b1-8335acc799db)
+
+#### Parameters
+
+| Parameter   | Type     | Description                                            |
+| ----------- | -------- | ------------------------------------------------------ |
+| x           | number   | The X coordinate to display the visibility toggle at.  |
+| y           | number   | The Y coordinate to display the visibility toggle at.  |
+
+#### CSS Customization
+
+- `.ha-toggle`: Parent class of the containing `<div>` ([default styling](https://github.com/hathora/hathora-phaser/blob/main/lib/styles.css#L25-L30)).
+- `.ha-toggle__switch`: Inner `<button>` classes ([default styling](https://github.com/hathora/hathora-phaser/blob/main/lib/styles.css#L32-L55)).
+- `(switch class).on`: Conditional class to signify the selected `<button>` element ([default styling](https://github.com/hathora/hathora-phaser/blob/main/lib/styles.css#L57-L68)).
+
+#### Example usage
+
+```ts
+this.add.haVisibilityToggle(250, 250);
+```

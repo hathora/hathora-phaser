@@ -4,6 +4,8 @@ This plugin extends Phaser's game object factory functions with several addition
 
 To see a working sample game, check out: [Hathora Phaser Sample Game - Fast Food](https://github.com/hathora/hathora-phaser-sample-game)
 
+To learn more about Hathora Cloud, check out: [Hathora Cloud Documentation](https://hathora.dev/docs)
+
 ## Usage
 
 Before calling any of the factory functions, you must first install the plugin within your Phaser game directory. You can do so via:
